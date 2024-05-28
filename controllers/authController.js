@@ -4,37 +4,37 @@ const jwt = require("jsonwebtoken");
 
 const registerController = async (req, res) => {
     try {
-        const existingUser = await userModel.findOne({ email: req.body.email })
-        // validation
-        if (existingUser) {
+        const exisitingUser = await userModel.findOne({ email: req.body.email });
+        //validation
+        if (exisitingUser) {
             return res.status(200).send({
                 success: false,
-                message: 'User Already exists'
+                message: "User ALready exists",
             });
         }
-        const salt = await bcrypt.genSalt(10)
-        const hashedPassword = await bcrypt.hash(req.body.password, salt)
-        req.body.password = hashedPassword
-        // reset data
-        const user = new userModel(req.body)
-        await user.save()
+        //hash password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(req.body.password, salt);
+        req.body.password = hashedPassword;
+        //rest data
+        const user = new userModel(req.body);
+        await user.save();
         return res.status(201).send({
             success: true,
-            message: 'User Registered Successfully',
+            message: "User Registerd Successfully",
             user,
         });
-
     } catch (error) {
         console.log(error);
         res.status(500).send({
             success: false,
-            messsage: 'Error In Register API',
+            message: "Error In Register API",
             error,
         });
     }
 };
 
-// login call back
+//login call back
 const loginController = async (req, res) => {
     try {
         const user = await userModel.findOne({ email: req.body.email });
@@ -45,12 +45,12 @@ const loginController = async (req, res) => {
             });
         }
         //check role
-        // if (user.role !== req.body.role) {
-        //     return res.status(500).send({
-        //         success: false,
-        //         message: "role dosent match",
-        //     });
-        // }
+        if (user.role !== req.body.role) {
+            return res.status(500).send({
+                success: false,
+                message: "role dosent match",
+            });
+        }
         //compare password
         const comparePassword = await bcrypt.compare(
             req.body.password,
@@ -81,8 +81,8 @@ const loginController = async (req, res) => {
     }
 };
 
-// GET CURRENT USER
-const CurrentUserController = async (req, res) => {
+//GET CURRENT USER
+const currentUserController = async (req, res) => {
     try {
         const user = await userModel.findOne({ _id: req.body.userId });
         return res.status(200).send({
@@ -100,4 +100,4 @@ const CurrentUserController = async (req, res) => {
     }
 };
 
-module.exports = { registerController, loginController, CurrentUserController };
+module.exports = { registerController, loginController, currentUserController };
